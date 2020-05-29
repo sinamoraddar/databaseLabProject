@@ -8,17 +8,18 @@ app.use(express.static(__dirname + "/public"));
 
 var connection = mysql.createConnection({
   host: "localhost",
-  user: "learnwithcolt",
-  database: "join_us",
+  user: "root",
+  password: "Wanted98wanted",
+  database: "university",
 });
 
 app.get("/", function (req, res) {
   // Find count of users in DB
-  var q = "SELECT COUNT(*) AS count FROM users";
+  var q = "select * from advisor;";
   connection.query(q, function (err, results) {
     if (err) throw err;
-    var count = results[0].count;
-    res.render("home", { count: count });
+    console.log(results);
+    res.send("hi");
   });
 });
 
@@ -32,6 +33,6 @@ app.post("/register", function (req, res) {
   });
 });
 
-app.listen(8080, function () {
+app.listen(4000, function () {
   console.log("Server running on 8080!");
 });
