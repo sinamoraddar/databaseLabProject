@@ -1,11 +1,12 @@
 var express = require("express");
 var mysql = require("mysql");
 var bodyParser = require("body-parser");
+const cors = require("cors");
 var app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
-
+app.use(cors());
 var connection = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -14,12 +15,24 @@ var connection = mysql.createConnection({
 });
 
 app.get("/", function (req, res) {
+  //on the home page => show all of the table names
+
   // Find count of users in DB
-  var q = "select * from advisor;";
+  var q = "SHOW TABLES;";
   connection.query(q, function (err, results) {
     if (err) throw err;
-    console.log(results);
-    res.send("hi");
+    // console.log(results);
+    res.json(results);
+  });
+});
+app.get("/tables/:table", function (req, res) {
+  //on the home page => show all of the table names
+  const tableName = req.params.table;
+  var q = `SELECT * FROM ${tableName}`;
+  connection.query(q, function (err, results) {
+    if (err) throw err;
+    //   console.log(results);
+    res.json(results);
   });
 });
 
