@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Axios from "axios";
+import Button from "@material-ui/core/Button";
 import { Link } from "react-router-dom";
 import { axiosInstance } from "../../api/axiosConfiguration";
 import styles from "./Home.module.scss";
@@ -18,12 +18,16 @@ const Home = () => {
   }, []);
   return (
     <div className={styles.home}>
-      these are the tables
-      {tableList.map((table) => (
-        <Link to={`/tables/${table}`} key={table}>
-          {table}
-        </Link>
-      ))}
+      <Link to={`/tables/student`}>
+        <Button variant="contained" color="primary">
+          student list
+        </Button>
+      </Link>
+      <Link to={`/tables/instructor`}>
+        <Button variant="contained" color="secondary">
+          instructor list
+        </Button>
+      </Link>
     </div>
   );
 };

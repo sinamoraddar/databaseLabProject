@@ -1,0 +1,28 @@
+.tablePage {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    a {
+      text-decoration: none;
+    }
+    margin: 2em 0;
+  }
+  > div,
+  header {
+    width: 70%;
+  }
+  > div {
+    margin-bottom: 5em;
+    thead {
+      background-color: rgba(99, 86, 86, 0.514);
+    }
+    tr:nth-of-type(2n) {
+      background-color: rgba(99, 86, 86, 0.214);
+    }
+  }
+}

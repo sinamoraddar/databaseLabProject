@@ -28,7 +28,14 @@ app.get("/", function (req, res) {
 app.get("/tables/:table", function (req, res) {
   //on the home page => show all of the table names
   const tableName = req.params.table;
-  var q = `SELECT * FROM ${tableName}`;
+  let q;
+  if (tableName === "student") {
+    q = `SELECT student.* ,advisor.i_ID FROM ${tableName}${
+      tableName === "student" ? ",advisor where(student.ID)=(advisor.s_ID)" : ""
+    }`;
+  } else {
+    q = `SELECT * FROM ${tableName}`;
+  }
   connection.query(q, function (err, results) {
     if (err) throw err;
     //   console.log(results);

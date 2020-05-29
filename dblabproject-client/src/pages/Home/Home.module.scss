@@ -1,4 +1,19 @@
 .home {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  :global {
+    .MuiButton-contained {
+      width: 100%;
+    }
+  }
+  a {
+    width: 80%;
+    max-width: 300px;
+    text-decoration: none;
+    color: white;
+    margin: 2em 0;
+  }
 }
