@@ -30,11 +30,39 @@ app.get("/tables/:table", function (req, res) {
   const tableName = req.params.table;
   let q;
   if (tableName === "student") {
-    q = `SELECT student.* ,advisor.i_ID FROM ${tableName}${
-      tableName === "student" ? ",advisor where(student.ID)=(advisor.s_ID)" : ""
-    }`;
+    q = `SELECT student.name student_name, student.dept_name student_department_name,student.tot_cred student_totalCredit,instructor.name instructor_name FROM ${tableName},advisor,instructor where(student.ID,advisor.i_ID)=(advisor.s_ID,instructor.ID) ORDER BY student.name`;
   } else {
-    q = `SELECT * FROM ${tableName}`;
+    q = `SELECT name,dept_name,salary FROM ${tableName} ORDER BY name`;
+  }
+  connection.query(q, function (err, results) {
+    if (err) throw err;
+    //   console.log(results);
+    res.json(results);
+  });
+});
+app.get("/students/:student/courses", function (req, res) {
+  //on the home page => show all of the table names
+  const tableName = req.params.table;
+  let q;
+  if (tableName === "student") {
+    q = `SELECT student.name student_name, student.dept_name student_department_name,student.tot_cred student_totalCredit,instructor.name instructor_name FROM ${tableName},advisor,instructor where(student.ID,advisor.i_ID)=(advisor.s_ID,instructor.ID) ORDER BY student.name`;
+  } else {
+    q = `SELECT name,dept_name,salary FROM ${tableName} ORDER BY name`;
+  }
+  connection.query(q, function (err, results) {
+    if (err) throw err;
+    //   console.log(results);
+    res.json(results);
+  });
+});
+app.get("/instructors/:instructor/courses", function (req, res) {
+  //on the home page => show all of the table names
+  const tableName = req.params.table;
+  let q;
+  if (tableName === "student") {
+    q = `SELECT student.name student_name, student.dept_name student_department_name,student.tot_cred student_totalCredit,instructor.name instructor_name FROM ${tableName},advisor,instructor where(student.ID,advisor.i_ID)=(advisor.s_ID,instructor.ID) ORDER BY student.name`;
+  } else {
+    q = `SELECT name,dept_name,salary FROM ${tableName} ORDER BY name`;
   }
   connection.query(q, function (err, results) {
     if (err) throw err;
@@ -54,5 +82,5 @@ app.post("/register", function (req, res) {
 });
 
 app.listen(4000, function () {
-  console.log("Server running on 8080!");
+  console.log("Server running on 4000!");
 });
