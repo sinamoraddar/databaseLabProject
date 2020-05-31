@@ -38,7 +38,7 @@ const TablePage = () => {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                {Object.keys(tableInfo[0]).map((key) => (
+                {Object.keys({ ...tableInfo[0], courses: [] }).map((key) => (
                   <TableCell key={key}>{key}</TableCell>
                 ))}
               </TableRow>
@@ -47,9 +47,18 @@ const TablePage = () => {
               {tableInfo.map((item, index) => {
                 return (
                   <TableRow key={index}>
-                    {Object.values(item).map((element) => (
+                    {Object.values({
+                      ...item,
+                    }).map((element) => (
                       <TableCell key={element}>{element}</TableCell>
                     ))}
+                    <TableCell>
+                      <Link to="/">
+                        <Button variant="contained" color="primary">
+                          Courses
+                        </Button>
+                      </Link>
+                    </TableCell>
                   </TableRow>
                 );
               })}
