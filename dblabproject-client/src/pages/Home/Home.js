@@ -18,12 +18,12 @@ const Home = () => {
   }, []);
   return (
     <div className={styles.home}>
-      <Link to={`/tables/student`}>
+      <Link to={`/student`}>
         <Button variant="contained" color="primary">
           student list
         </Button>
       </Link>
-      <Link to={`/tables/instructor`}>
+      <Link to={`/instructor`}>
         <Button variant="contained" color="secondary">
           instructor list
         </Button>

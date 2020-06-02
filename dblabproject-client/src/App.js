@@ -9,7 +9,9 @@ function App() {
     <BrowserRouter>
       <Switch>
         <Route path="/" component={Home} exact />
-        <Route path="/tables/:table" component={TablePage} exact />
+        <Route path="/:table" component={TablePage} exact />
+        <Route path="/courses/student/:ID" component={TablePage} exact />
+        <Route path="/courses/instructor/:ID" component={TablePage} exact />
         <Redirect to="/" />
       </Switch>
     </BrowserRouter>

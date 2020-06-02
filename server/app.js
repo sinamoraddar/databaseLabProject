@@ -30,9 +30,9 @@ app.get("/tables/:table", function (req, res) {
   const tableName = req.params.table;
   let q;
   if (tableName === "student") {
-    q = `SELECT student.name student_name, student.dept_name student_department_name,student.tot_cred student_totalCredit,instructor.name instructor_name FROM ${tableName},advisor,instructor where(student.ID,advisor.i_ID)=(advisor.s_ID,instructor.ID) ORDER BY student.name`;
+    q = `SELECT student.ID ID, student.name name, student.dept_name student_department_name,student.tot_cred student_totalCredit,instructor.name instructor_name FROM ${tableName},advisor,instructor where(student.ID,advisor.i_ID)=(advisor.s_ID,instructor.ID) ORDER BY student.name`;
   } else {
-    q = `SELECT name,dept_name,salary FROM ${tableName} ORDER BY name`;
+    q = `SELECT ID, name,dept_name,salary FROM ${tableName} ORDER BY name`;
   }
   connection.query(q, function (err, results) {
     if (err) throw err;
@@ -40,15 +40,11 @@ app.get("/tables/:table", function (req, res) {
     res.json(results);
   });
 });
-app.get("/students/:student/courses", function (req, res) {
+app.get("/courses/student/:ID", function (req, res) {
   //on the home page => show all of the table names
-  const tableName = req.params.table;
-  let q;
-  if (tableName === "student") {
-    q = `SELECT student.name student_name, student.dept_name student_department_name,student.tot_cred student_totalCredit,instructor.name instructor_name FROM ${tableName},advisor,instructor where(student.ID,advisor.i_ID)=(advisor.s_ID,instructor.ID) ORDER BY student.name`;
-  } else {
-    q = `SELECT name,dept_name,salary FROM ${tableName} ORDER BY name`;
-  }
+  const ID = req.params.ID;
+  let q = `SELECT takes.ID,takes.course_id,course.title,takes.semester,takes.year,takes.grade FROM  takes  INNER JOIN course ON course.course_id=takes.course_id where ${ID}=takes.ID ORDER BY course.title`;
+
   connection.query(q, function (err, results) {
     if (err) throw err;
     //   console.log(results);
@@ -70,14 +66,15 @@ app.get("/instructors/:instructor/courses", function (req, res) {
     res.json(results);
   });
 });
-
-app.post("/register", function (req, res) {
-  var person = {
-    email: req.body.email,
-  };
-  connection.query("INSERT INTO users SET ?", person, function (err, result) {
+app.post("/course/takes/:studentID/:courseID", function (req, res) {
+  //  ID    | course_id | sec_id | semester | year | grade isOneOf[A,b,c,d]|
+});
+app.delete("/course/takes/:studentID/:courseID", function (req, res) {
+  let { courseID, studentID } = req.params;
+  let q = `delete from takes where takes.ID='${studentID}' and takes.course_id='${courseID}'`;
+  connection.query(q, function (err, result) {
     if (err) throw err;
-    res.redirect("/");
+    res.send("done");
   });
 });
 
