@@ -6,6 +6,8 @@ var app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
+// Parse JSON bodies (as sent by API clients)
+app.use(express.json());
 app.use(cors());
 var connection = mysql.createConnection({
   host: "localhost",
@@ -62,6 +64,17 @@ app.get("/courses/student/:ID", function (req, res) {
     res.json(results);
   });
 });
+app.get("/courses/instructor/:ID", function (req, res) {
+  //on the home page => show all of the table names
+  const ID = req.params.ID;
+  let q = `SELECT teaches.ID,teaches.course_id,teaches.sec_id,teaches.semester,teaches.year,title,dept_name ,credits FROM  teaches  INNER JOIN course ON course.course_id=teaches.course_id where ${ID}=teaches.ID ORDER BY course.title `;
+
+  connection.query(q, function (err, results) {
+    if (err) throw err;
+    //   console.log(results);
+    res.json(results);
+  });
+});
 app.get("/instructors/:instructor/courses", function (req, res) {
   //on the home page => show all of the table names
   const tableName = req.params.table;
@@ -77,9 +90,14 @@ app.get("/instructors/:instructor/courses", function (req, res) {
     res.json(results);
   });
 });
-app.post("/course/takes/:studentID/:courseID", function (req, res) {
+app.post("/course/takes", function (req, res) {
   //  ID    | course_id | sec_id | semester | year | grade isOneOf[A,b,c,d]|
-  // TODO: use section table
+  const { ID, course_id, sec_id, semester, year, grade } = req.body;
+  let q = `INSERT  INTO takes VALUES  ('${ID}','${course_id}','${sec_id}','${semester}','${year}','${grade}')`;
+  connection.query(q, function (err, result) {
+    if (err) throw err;
+    res.send("done");
+  });
 });
 app.delete("/course/takes/:studentID/:courseID", function (req, res) {
   let { courseID, studentID } = req.params;

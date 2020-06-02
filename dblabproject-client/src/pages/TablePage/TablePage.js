@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { useParams, Link, useHistory } from "react-router-dom";
 import { axiosInstance } from "../../api/axiosConfiguration";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -19,6 +19,8 @@ const TablePage = ({ location }) => {
   const [sectionList, setSectionList] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const headerRef = useRef(null);
+  const history = useHistory();
 
   const getInfo = useCallback(() => {
     let customRoute = table
@@ -55,60 +57,76 @@ const TablePage = ({ location }) => {
   const handleSelection = useCallback(
     (item) => {
       console.log(item);
+      axiosInstance
+        .post("/course/takes", { ...item, grade: "-", ID })
+        .then((response) => {
+          getInfo();
+        })
+        .catch((error) => console.log(error));
       setSelectedItem(item);
       toggleMenu();
     },
-    [toggleMenu]
+    [toggleMenu, ID, getInfo]
   );
   // console.log(window.location);
+  const goBack = useCallback(() => {
+    history.goBack();
+  }, [history]);
   return (
     <div className={styles.tablePage}>
       <header>
         <h1>{table || `${location.state.name}'s course`} list</h1>
-        <Link to="/">
+        <div>
+          {/* <Link to="/"> */}
           <Button
             style={{ backgroundColor: "green" }}
             variant="contained"
             color="secondary"
+            onClick={goBack}
           >
-            Go Home{" "}
+            Go Back{" "}
           </Button>
-        </Link>
+          {/* </Link> */}
 
-        {window.location.pathname.includes("/courses/student") && (
-          <div>
-            <Button
-              // style={{ backgroundColor: "red" }}
-              variant="contained"
-              color="primary"
-              onClick={toggleMenu}
-            >
-              Add Course
-            </Button>
-            <Menu
-              id="simple-menu"
-              anchorEl={selectedItem}
-              keepMounted
-              open={isMenuOpen}
-              onClose={toggleMenu}
-            >
-              {sectionList
-                .filter(({ course_id }) => {
-                  return !tableInfo.some(
-                    (table) => table.course_id === course_id
-                  );
-                })
-                .map((item, index) => (
-                  <MenuItem
-                    onClick={handleSelection.bind(null, item)}
-                    key={index}
-                  >
-                    {item.title} ({item.sec_id}) , {item.semester} , {item.year}
-                  </MenuItem>
-                ))}
-            </Menu>
-          </div>
-        )}
+          {window.location.pathname.includes("/courses/student") && (
+            <div>
+              <Button
+                ref={headerRef}
+                aria-controls="simple-menu"
+                aria-haspopup="true"
+                // style={{ backgroundColor: "red" }}
+                variant="contained"
+                color="primary"
+                onClick={toggleMenu}
+              >
+                Add Course
+              </Button>
+              <Menu
+                id="simple-menu"
+                anchorEl={headerRef.current}
+                keepMounted
+                open={isMenuOpen}
+                onClose={toggleMenu}
+              >
+                {sectionList
+                  .filter(({ course_id }) => {
+                    return !tableInfo.some(
+                      (table) => table.course_id === course_id
+                    );
+                  })
+                  .map((item, index) => (
+                    <MenuItem
+                      onClick={handleSelection.bind(null, item)}
+                      key={index}
+                    >
+                      {item.title} ({item.sec_id}) , {item.semester} ,{" "}
+                      {item.year}
+                    </MenuItem>
+                  ))}
+              </Menu>
+            </div>
+          )}
+        </div>
       </header>
       {tableInfo.length > 0 ? (
         <TableContainer component={Paper}>
@@ -135,42 +153,46 @@ const TablePage = ({ location }) => {
                     }).map((element) => (
                       <TableCell key={element}>{element}</TableCell>
                     ))}
-                    <TableCell>
-                      {window.location.pathname === "/student" ||
-                      window.location.pathname === "/instructor" ? (
-                        <Link
-                          to={{
-                            pathname: `/courses/${
-                              window.location.pathname === "/student"
-                                ? "student"
-                                : "instructor"
-                            }/${item.ID}`,
-                            state: { name: item.name },
-                          }}
-                        >
-                          <Button variant="contained" color="primary">
-                            Courses
-                          </Button>
-                        </Link>
-                      ) : (
-                        window.location.pathname.includes(
-                          "/courses/student"
-                        ) && (
-                          <Button
-                            style={{ backgroundColor: "red" }}
-                            variant="contained"
-                            color="primary"
-                            onClick={() => {
-                              handleDelete({
-                                courseID: item.course_id,
-                              });
+                    {window.location.pathname.includes(
+                      "/courses/instructor"
+                    ) ? null : (
+                      <TableCell>
+                        {window.location.pathname === "/student" ||
+                        window.location.pathname === "/instructor" ? (
+                          <Link
+                            to={{
+                              pathname: `/courses/${
+                                window.location.pathname === "/student"
+                                  ? "student"
+                                  : "instructor"
+                              }/${item.ID}`,
+                              state: { name: item.name },
                             }}
                           >
-                            Delete
-                          </Button>
-                        )
-                      )}
-                    </TableCell>
+                            <Button variant="contained" color="primary">
+                              Courses
+                            </Button>
+                          </Link>
+                        ) : (
+                          window.location.pathname.includes(
+                            "/courses/student"
+                          ) && (
+                            <Button
+                              style={{ backgroundColor: "red" }}
+                              variant="contained"
+                              color="primary"
+                              onClick={() => {
+                                handleDelete({
+                                  courseID: item.course_id,
+                                });
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          )
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}

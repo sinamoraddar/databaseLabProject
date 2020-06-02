@@ -4,9 +4,17 @@
   justify-content: flex-start;
   align-items: center;
   header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    &,
+    > div {
+      display: flex;
+    }
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    > div {
+      justify-content: space-between;
+      align-items: center;
+    }
     a {
       text-decoration: none;
     }
