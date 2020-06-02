@@ -67,7 +67,7 @@ app.get("/courses/student/:ID", function (req, res) {
 app.get("/courses/instructor/:ID", function (req, res) {
   //on the home page => show all of the table names
   const ID = req.params.ID;
-  let q = `SELECT teaches.ID,teaches.course_id,teaches.sec_id,teaches.semester,teaches.year,title,dept_name ,credits FROM  teaches  INNER JOIN course ON course.course_id=teaches.course_id where ${ID}=teaches.ID ORDER BY course.title `;
+  let q = `SELECT teaches.ID,teaches.course_id,title,teaches.sec_id,teaches.semester,teaches.year,dept_name ,credits FROM  teaches  INNER JOIN course ON course.course_id=teaches.course_id where ${ID}=teaches.ID ORDER BY course.title `;
 
   connection.query(q, function (err, results) {
     if (err) throw err;
