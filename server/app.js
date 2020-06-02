@@ -30,7 +30,7 @@ app.get("/tables/:table", function (req, res) {
   const tableName = req.params.table;
   let q;
   if (tableName === "student") {
-    q = `SELECT student.ID ID, student.name name, student.dept_name student_department_name,student.tot_cred student_totalCredit,instructor.name instructor_name FROM ${tableName},advisor,instructor where(student.ID,advisor.i_ID)=(advisor.s_ID,instructor.ID) ORDER BY student.name`;
+    q = `SELECT student.ID ID, student.name name, student.dept_name student_department_name,student.tot_cred student_totalCredit,instructor.name advisor_name FROM ${tableName},advisor,instructor where(student.ID,advisor.i_ID)=(advisor.s_ID,instructor.ID) ORDER BY student.name`;
   } else {
     q = `SELECT ID, name,dept_name,salary FROM ${tableName} ORDER BY name`;
   }
@@ -40,10 +40,21 @@ app.get("/tables/:table", function (req, res) {
     res.json(results);
   });
 });
+app.get("/section", function (req, res) {
+  //on the home page => show all of the table names
+  let q =
+    "SELECT section.course_id,section.sec_id,course.title,section.semester,section.year FROM section,course where section.course_id=course.course_id ORDER BY course.title,section.sec_id";
+
+  connection.query(q, function (err, results) {
+    if (err) throw err;
+    //   console.log(results);
+    res.json(results);
+  });
+});
 app.get("/courses/student/:ID", function (req, res) {
   //on the home page => show all of the table names
   const ID = req.params.ID;
-  let q = `SELECT takes.ID,takes.course_id,course.title,takes.semester,takes.year,takes.grade FROM  takes  INNER JOIN course ON course.course_id=takes.course_id where ${ID}=takes.ID ORDER BY course.title`;
+  let q = `SELECT takes.ID,takes.course_id,course.title,takes.semester,takes.year,takes.grade FROM  takes  INNER JOIN course ON course.course_id=takes.course_id where ${ID}=takes.ID ORDER BY course.title `;
 
   connection.query(q, function (err, results) {
     if (err) throw err;
@@ -68,6 +79,7 @@ app.get("/instructors/:instructor/courses", function (req, res) {
 });
 app.post("/course/takes/:studentID/:courseID", function (req, res) {
   //  ID    | course_id | sec_id | semester | year | grade isOneOf[A,b,c,d]|
+  // TODO: use section table
 });
 app.delete("/course/takes/:studentID/:courseID", function (req, res) {
   let { courseID, studentID } = req.params;

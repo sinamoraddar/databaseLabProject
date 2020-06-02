@@ -8,12 +8,17 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 import styles from "./TablePage.module.scss";
 import { Button } from "@material-ui/core";
 
 const TablePage = ({ location }) => {
   const { table, user, ID } = useParams();
   const [tableInfo, setTableInfo] = useState([]);
+  const [sectionList, setSectionList] = useState([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const getInfo = useCallback(() => {
     let customRoute = table
@@ -26,6 +31,10 @@ const TablePage = ({ location }) => {
         // debugger;
         setTableInfo(response.data);
       })
+      .catch((error) => console.log(error));
+    axiosInstance
+      .get("/section")
+      .then((response) => setSectionList(response.data))
       .catch((error) => console.log(error));
   }, [table]);
   const handleDelete = useCallback(
@@ -40,7 +49,18 @@ const TablePage = ({ location }) => {
   useEffect(() => {
     getInfo();
   }, [getInfo]);
-  console.log(window.location);
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen((isMenuOpen) => !isMenuOpen);
+  }, []);
+  const handleSelection = useCallback(
+    (item) => {
+      console.log(item);
+      setSelectedItem(item);
+      toggleMenu();
+    },
+    [toggleMenu]
+  );
+  // console.log(window.location);
   return (
     <div className={styles.tablePage}>
       <header>
@@ -53,18 +73,42 @@ const TablePage = ({ location }) => {
           >
             Go Home{" "}
           </Button>
-          {window.location.pathname.includes("/courses/student") && (
-            <div>
-              <Button
-                // style={{ backgroundColor: "red" }}
-                variant="contained"
-                color="primary"
-              >
-                Add Course
-              </Button>
-            </div>
-          )}
         </Link>
+
+        {window.location.pathname.includes("/courses/student") && (
+          <div>
+            <Button
+              // style={{ backgroundColor: "red" }}
+              variant="contained"
+              color="primary"
+              onClick={toggleMenu}
+            >
+              Add Course
+            </Button>
+            <Menu
+              id="simple-menu"
+              anchorEl={selectedItem}
+              keepMounted
+              open={isMenuOpen}
+              onClose={toggleMenu}
+            >
+              {sectionList
+                .filter(({ course_id }) => {
+                  return !tableInfo.some(
+                    (table) => table.course_id === course_id
+                  );
+                })
+                .map((item, index) => (
+                  <MenuItem
+                    onClick={handleSelection.bind(null, item)}
+                    key={index}
+                  >
+                    {item.title} ({item.sec_id}) , {item.semester} , {item.year}
+                  </MenuItem>
+                ))}
+            </Menu>
+          </div>
+        )}
       </header>
       {tableInfo.length > 0 ? (
         <TableContainer component={Paper}>
